@@ -1,26 +1,22 @@
 #!/usr/bin/python
-import logging
 import os
 import sys
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
-from flexget import logger
-from flexget.manager import Manager
-
-
-log = logging.getLogger('main')
+from flexget import log  # noqa
+from flexget.manager import Manager  # noqa
 
 
 def main(args=None):
     """Main entry point for Command Line Interface"""
 
     try:
-        logger.initialize()
+        log.initialize()
 
         try:
             manager = Manager(args)
-        except (IOError, ValueError) as e:
+        except (OSError, ValueError) as e:
             if _is_debug():
                 import traceback
 
@@ -43,7 +39,7 @@ def main(args=None):
                 )
             else:
                 manager.start()
-        except (IOError, ValueError) as e:
+        except (OSError, ValueError) as e:
             if _is_debug():
                 import traceback
 

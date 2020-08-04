@@ -1,8 +1,7 @@
-import io
-import logging
 import os
 
 import yaml
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more, process_config
@@ -10,7 +9,7 @@ from flexget.event import event
 from flexget.utils.tools import MergeException
 
 plugin_name = 'include'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
 class PluginInclude:
@@ -39,17 +38,17 @@ class PluginInclude:
             file = os.path.expanduser(file_name)
             if not os.path.isabs(file):
                 file = os.path.join(task.manager.config_base, file)
-            with io.open(file, encoding='utf-8') as inc_file:
+            with open(file, encoding='utf-8') as inc_file:
                 include = yaml.safe_load(inc_file)
                 inc_file.flush()
             errors = process_config(include, plugin.plugin_schemas(interface='task'))
             if errors:
-                log.error('Included file %s has invalid config:', file)
+                logger.error('Included file {} has invalid config:', file)
                 for error in errors:
-                    log.error('[%s] %s', error.json_pointer, error.message)
+                    logger.error('[{}] {}', error.json_pointer, error.message)
                 task.abort('Invalid config in included file %s' % file)
 
-            log.debug('Merging %s into task %s', file, task.name)
+            logger.debug('Merging {} into task {}', file, task.name)
             # merge
             try:
                 task.merge_config(include)
